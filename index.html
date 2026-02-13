@@ -1,134 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<title>Mini APK Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-<style>
-  body { font-family:'Roboto',sans-serif; margin:0; padding:0; background:#1e1e1e; color:#fff; display:flex; flex-direction:column; align-items:center;}
-  header {width:100%; text-align:center; background:#242424; padding:20px;}
-  h1{margin:0;font-size:24px;}
-  .tabs {display:flex; margin-top:10px;}
-  .tab {padding:10px 20px; cursor:pointer; border-bottom:2px solid transparent; margin-right:5px;}
-  .tab.active{border-bottom:3px solid #007acc; font-weight:bold;}
-  .editor-box{width:90%; max-width:1200px; height:400px; border:1px solid #333; display:none; margin-top:10px;}
-  .editor-box.active{display:block;}
-  .buttons{margin:20px;}
-  button{padding:10px 20px; font-size:16px; background:#007acc; border:none; color:white; cursor:pointer; border-radius:5px; margin-right:10px;}
-  button:hover{background:#005a9e;}
-  #downloadLink{color:#00ffea; text-decoration:none; font-weight:bold; display:block; margin-top:10px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenDeta | Digital Solutions</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        
+        /* RGB Logo Animation */
+        @keyframes rgbWave { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .logo-text { font-size: 50px; font-weight: 900; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: rgbWave 3s linear infinite; text-align: center; margin-bottom: 40px; z-index: 100; position: relative; }
+        
+        #intro-screen { position: fixed; width: 100%; height: 100%; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #binary-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: #000; }
+        #go-btn { padding: 15px 50px; font-size: 22px; color: #fff; background: rgba(0,0,0,0.5); border: 2px solid #fff; border-radius: 50px; cursor: pointer; z-index: 100; position: relative; }
+
+        #galaxy-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 60; }
+
+        /* Main Content Screen */
+        #main-content { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            display: none; background: #050505; color: white; 
+            overflow-y: auto; z-index: 100; padding: 40px 5%; box-sizing: border-box;
+        }
+
+        .od-header { font-size: 40px; font-weight: bold; color: #ffcc00; text-align: center; margin-bottom: 30px; }
+        
+        /* Accordion */
+        .accordion { background: #111; border: 1px solid #333; margin-bottom: 10px; border-radius: 8px; overflow: hidden; }
+        .acc-btn { width: 100%; padding: 15px; text-align: left; background: none; border: none; color: #00d2ff; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; }
+        .acc-btn:hover { background: #222; }
+        .acc-content { padding: 0 15px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #0a0a0a; color: #ccc; font-size: 16px; line-height: 1.6; }
+
+        /* App Item Style */
+        .app-item { border-bottom: 1px solid #222; padding: 15px 0; }
+        .app-item:last-child { border-bottom: none; }
+        .app-name { display: block; font-weight: bold; color: #fff; margin-bottom: 8px; }
+        .download-btn { display: inline-block; padding: 8px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold; transition: 0.2s; }
+        .download-btn:hover { background: #218838; transform: scale(1.05); }
+
+        .site-link { display: block; color: #ffcc00; text-decoration: none; margin: 10px 0; padding: 5px; border-bottom: 1px solid #222; }
+        .contact-btn { display: block; width: 100%; padding: 20px; background: #00d2ff; color: #000; text-align: center; text-decoration: none; font-weight: bold; font-size: 18px; margin-top: 40px; border-radius: 10px; }
+    </style>
 </head>
 <body>
 
-<header>
-  <h1>Mini APK Builder</h1>
-  <p>Paste XML & Java code, then click ▶️ Build App!</p>
-</header>
+    <canvas id="binary-canvas"></canvas>
 
-<div class="tabs">
-  <div class="tab active">MAIN.XML</div>
-  <div class="tab">MAINACTIVITY.JAVA</div>
-</div>
+    <div id="intro-screen">
+        <div class="logo-text">OpenDeta</div>
+        <button id="go-btn" onclick="startWarp()">Go</button>
+    </div>
 
-<div id="xmlEditor" class="editor-box active"></div>
-<div id="javaEditor" class="editor-box"></div>
+    <div id="galaxy-container"></div>
 
-<div class="buttons">
-  <button onclick="buildAPK()">▶️ Build App</button>
-  <a id="downloadLink" href="#" target="_blank">Download APK (placeholder)</a>
-</div>
+    <div id="main-content">
+        <div class="od-header">OpenDeta</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.15.6/ace.js"></script>
-<script>
-  // Tab switching
-  const tabs = document.querySelectorAll('.tab');
-  const editors = document.querySelectorAll('.editor-box');
-  tabs.forEach((tab,index)=>{
-    tab.addEventListener('click',()=>{
-      tabs.forEach(t=>t.classList.remove('active'));
-      editors.forEach(e=>e.classList.remove('active'));
-      tab.classList.add('active');
-      editors[index].classList.add('active');
-    });
-  });
+        <div class="accordion">
+            <button class="acc-btn" onclick="toggleAcc(this)">OpenDeta Team <span>+</span></button>
+            <div class="acc-content">
+                <p>1: Fusion Ascend (FA)<br>2: ______ [it's Hidden]<br>3: Gemini</p>
+            </div>
+        </div>
 
-  // Initialize XML editor
-  const xmlEditor = ace.edit("xmlEditor");
-  xmlEditor.setTheme("ace/theme/monokai");
-  xmlEditor.session.setMode("ace/mode/xml");
-  xmlEditor.setOptions({fontSize:"14pt", showLineNumbers:true, tabSize:4, useSoftTabs:true, wrap:true});
-  xmlEditor.setValue(`<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-</LinearLayout>`);
+        <div class="accordion">
+            <button class="acc-btn" onclick="toggleAcc(this)">About OpenDeta <span>+</span></button>
+            <div class="acc-content">
+                <p>OpenDeta is a Developer Team. They Think Ideas & Convert the ideas for Real-time, it's Like App & Website. OpenDeta is founded on many strong principles (Policy) such as: Operating Policy (OP), Security Policy (SP), Privacy Policy (PP).</p>
+            </div>
+        </div>
 
-  // Initialize Java editor
-  const javaEditor = ace.edit("javaEditor");
-  javaEditor.setTheme("ace/theme/monokai");
-  javaEditor.session.setMode("ace/mode/java");
-  javaEditor.setOptions({fontSize:"14pt", showLineNumbers:true, tabSize:4, useSoftTabs:true, wrap:true});
-  javaEditor.setValue(`package com.example.myapp;
+        <div class="accordion">
+            <button class="acc-btn" onclick="toggleAcc(this)">Websites created with OpenDeta <span>+</span></button>
+            <div class="acc-content">
+                <strong>OpenDeta Websites:</strong>
+                <a class="site-link" href="https://ai-art-pro.netlify.app/" target="_blank">1: To create images with AI</a>
+                <a class="site-link" href="https://acode3.netlify.app" target="_blank">2: Code Editor/Runner (HTML, CSS, JS)</a>
+                <a class="site-link" href="https://binary-pro3.netlify.app/" target="_blank">3: Human to Binary Translator</a>
+                <a class="site-link" href="https://chat-atlas-ai.netlify.app/" target="_blank">4: Chatbot AI</a>
+                <a class="site-link" href="https://art-atlas.netlify.app/" target="_blank">5: AI Image Generator (Normal)</a>
+            </div>
+        </div>
 
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+        <div class="accordion">
+            <button class="acc-btn" onclick="toggleAcc(this)">Our Apps <span>+</span></button>
+            <div class="acc-content">
+                <div class="app-item">
+                    <span class="app-name">1: Ad Blocker Pro (Browser)</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1YyZOI5iMznkNS8YSM5Wt-iyxSgKYVkEA/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">2: Ad Blocker (Normal)</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1bSimNkvddh_VnMDTV78mQAPuJRJeTyuC/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">3: Web (Link) To App</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1XxRSt1b2kXBtPt9OZOqtHdMTZ8DD3WF8/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">4: Android Studio (HTML To App)</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1QRJYLTA7KNv_EZQ0GuiZ1gDiwAB113Se/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">5: Source Code Viewer</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1cFSIvkkkC3QEA8HhreKXUdKLcQZ66fcB/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">6: Internet Speed Meter</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1QBHt07Uv367zgXv_2ESpT-Bh1x1cVnjj/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">7: Notepad</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1mVl-yZlpnxCeFKHq391XIVClSbY35tBw/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+                <div class="app-item">
+                    <span class="app-name">8: Temperature Meter</span>
+                    <a class="download-btn" href="https://drive.google.com/file/d/1eKejWAAqKLgYOIyfsYXvV_Qx7fwp21nK/view?usp=drivesdk" target="_blank">Download App</a>
+                </div>
+            </div>
+        </div>
 
-public class MainActivity extends AppCompatActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
-}`);
+        <a href="mailto:opendeta.dev@gmail.com" class="contact-btn">Developer Contact & Send Feedback</a>
+    </div>
 
-  // Build APK function (GitHub Actions + download link auto update)
-  async function buildAPK(){
-    const xmlCode = xmlEditor.getValue();
-    const javaCode = javaEditor.getValue();
+    <script>
+        // Binary Rain
+        const canvas = document.getElementById('binary-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const katakana = '01'; const fontSize = 18; const columns = canvas.width / fontSize;
+        const rainDrops = Array.from({ length: columns }).fill(1);
+        const draw = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0'; ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = katakana.charAt(Math.floor(Math.random() * katakana.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
+                rainDrops[i]++;
+            }
+        };
+        setInterval(draw, 30);
 
-    const token = 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN';
-    const repo = '<username>/MiniAPKBuilder';
-    const workflow = 'build-apk.yml';
-
-    try{
-      // Trigger GitHub Actions workflow
-      const res = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`, {
-        method:'POST',
-        headers:{
-          'Accept':'application/vnd.github+json',
-          'Authorization':`token ${token}`
-        },
-        body:JSON.stringify({ ref:'main', inputs:{ java_code:javaCode, xml_code:xmlCode } })
-      });
-
-      if(res.ok){
-        alert("Build triggered! Waiting for APK...");
-
-        // Poll GitHub Actions artifacts every 5 sec
-        const artifactURL = `https://api.github.com/repos/${repo}/actions/artifacts`;
-        const pollArtifact = async () => {
-          const artifactsRes = await fetch(artifactURL,{
-            headers:{'Authorization':`token ${token}`}
-          });
-          const data = await artifactsRes.json();
-          if(data.artifacts && data.artifacts.length>0){
-            const apkURL = data.artifacts[0].archive_download_url.replace('archive','download');
-            const downloadLink = document.getElementById("downloadLink");
-            downloadLink.href = apkURL;
-            downloadLink.innerText = "Download APK ✅";
-          } else {
-            setTimeout(pollArtifact,5000); // retry after 5 sec
-          }
+        // Galaxy Warp
+        let scene, camera, renderer, starGeo, stars;
+        function initGalaxy() {
+            scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.z = 1; camera.rotation.x = Math.PI/2;
+            renderer = new THREE.WebGLRenderer(); renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('galaxy-container').appendChild(renderer.domElement);
+            let points = []; for(let i=0; i<6000; i++) points.push(new THREE.Vector3(Math.random()*600-300, Math.random()*600-300, Math.random()*600-300));
+            starGeo = new THREE.BufferGeometry().setFromPoints(points);
+            stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 0.7}));
+            scene.add(stars);
+            function animate() {
+                const pos = starGeo.attributes.position.array;
+                for(let i=1; i<pos.length; i+=3) { pos[i]-=15; if(pos[i]<-300) pos[i]=300; }
+                starGeo.attributes.position.needsUpdate = true; renderer.render(scene, camera); requestAnimationFrame(animate);
+            }
+            animate();
         }
-        pollArtifact();
-      }else{
-        alert("Failed to trigger build");
-      }
-    }catch(e){
-      alert("Error: "+e.message);
-    }
-  }
-</script>
+
+        function startWarp() {
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('binary-canvas').style.display = 'none';
+            document.getElementById('galaxy-container').style.display = 'block';
+            initGalaxy();
+            setTimeout(() => {
+                document.getElementById('galaxy-container').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }, 1800);
+        }
+
+        function toggleAcc(btn) {
+            const content = btn.nextElementSibling;
+            const span = btn.querySelector('span');
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                span.innerText = "+";
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                span.innerText = "-";
+            }
+        }
+    </script>
 </body>
 </html>
