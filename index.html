@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,6 +31,27 @@
         }
         #go-btn:hover { background: #fff; color: #000; }
 
+        /* Google Transition Overlay */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 500; display: none;
+            justify-content: center; align-items: center;
+        }
+        .beam { position: absolute; width: 200px; height: 8px; opacity: 0; border-radius: 10px; }
+        .blue   { background-color: #4285F4; top: calc(50% - 22px); animation: rushL 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+        .green  { background-color: #34A853; top: calc(50% - 8px);  animation: rushL 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1) 0.1s; }
+        .yellow { background-color: #FBBC05; top: calc(50% + 8px);  animation: rushR 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+        .red    { background-color: #EA4335; top: calc(50% + 22px); animation: rushR 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1) 0.1s; }
+        .text-logo-overlay {
+            position: absolute; font-family: 'Product Sans', sans-serif; font-size: clamp(40px, 10vw, 70px); font-weight: 900;
+            background: linear-gradient(90deg, #4285F4, #34A853, #FBBC05, #EA4335);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0; z-index: 10; animation: reveal 2.5s infinite;
+        }
+
+        @keyframes rushL { 0% { transform: translateX(-110vw); opacity: 1; width: 300px; } 22% { transform: translateX(0); opacity: 1; width: 40px; } 28%, 100% { transform: translateX(120px); opacity: 0; width: 0; } }
+        @keyframes rushR { 0% { transform: translateX(110vw); opacity: 1; width: 300px; } 22% { transform: translateX(0); opacity: 1; width: 40px; } 28%, 100% { transform: translateX(-120px); opacity: 0; width: 0; } }
+        @keyframes reveal { 0%, 20% { opacity: 0; transform: scale(0.5); } 25% { opacity: 1; transform: scale(1); } 90%, 100% { opacity: 0; } }
+
         /* Main Content UI */
         #main-content { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -45,37 +66,33 @@
         .acc-btn { width: 100%; padding: 18px; text-align: left; background: none; border: none; color: #00d2ff; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .acc-content { padding: 0 15px; max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; background: #0a0a0a; color: #ccc; line-height: 1.6; }
 
-        /* App Reveal Animation */
-        .app-item { 
-            border: 1px solid #222; margin: 20px 0; padding: 25px; 
-            border-radius: 15px; background: #111; text-align: center;
-            opacity: 0; transform: translateY(50px); transition: all 0.6s ease-out;
-        }
+        /* App Items */
+        .app-item { border: 1px solid #222; margin: 20px 0; padding: 25px; border-radius: 15px; background: #111; text-align: center; opacity: 0; transform: translateY(50px); transition: 0.6s; }
         .app-item.reveal { opacity: 1; transform: translateY(0); }
         .app-name { display: block; font-weight: bold; color: #fff; margin-bottom: 20px; font-size: 19px; }
 
-        /* Stylish Buttons */
         .download-btn, .contact-btn { 
-            display: inline-block; padding: 12px 35px; 
-            background: linear-gradient(135deg, #6e8efb, #a777e3); 
-            color: white; text-decoration: none; border-radius: 50px; 
-            font-size: 15px; font-weight: bold; transition: 0.3s; 
-            box-shadow: 0 4px 15px rgba(110, 142, 251, 0.3);
-            border: none; cursor: pointer;
+            display: inline-block; padding: 12px 35px; background: linear-gradient(135deg, #6e8efb, #a777e3); 
+            color: white; text-decoration: none; border-radius: 50px; font-size: 15px; font-weight: bold; transition: 0.3s; border: none; cursor: pointer;
         }
         .download-btn:hover, .contact-btn:hover { transform: scale(1.08); box-shadow: 0 8px 25px rgba(167, 119, 227, 0.5); }
-
         .contact-wrapper { text-align: center; margin: 40px 0; }
-
         .site-link { display: block; color: #ffcc00; text-decoration: none; margin: 12px 0; padding: 12px; border-radius: 8px; border: 1px solid #222; transition: 0.3s; }
         .site-link:hover { background: #1a1a1a; border-color: #ffcc00; }
-        
         #galaxy-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 60; }
     </style>
 </head>
 <body>
 
     <canvas id="binary-canvas"></canvas>
+
+    <div id="loading-overlay">
+        <div class="beam blue"></div>
+        <div class="beam green"></div>
+        <div class="beam yellow"></div>
+        <div class="beam red"></div>
+        <div class="text-logo-overlay">OpenDeta</div>
+    </div>
 
     <div id="intro-screen">
         <div class="logo-text">OpenDeta</div>
@@ -92,8 +109,7 @@
         <div class="accordion">
             <button class="acc-btn" onclick="toggleAcc(this)">About OpenDeta <span>+</span></button>
             <div class="acc-content">
-                <p style="padding: 15px;">At OpenDeta, we are constantly trying to create something new, which makes your daily work easier and smarter. Our mission: “Building The Logic of Tomorrow”.<br><br>
-                Each of our projects and ideas is designed with the goal of making it easier for people to connect with the technology of tomorrow. Welcome to join us on the journey of new possibilities and innovations.</p>
+                <p style="padding: 15px;">At OpenDeta, we are constantly trying to create something new, which makes your daily work easier and smarter. <br><br> Our mission: “Building The Logic of Tomorrow”.Each of our projects and ideas is designed with the goal of making it easier for people to connect with the technology of tomorrow. Welcome to join us on the journey of new possibilities and innovations.</p>
             </div>
         </div>
 
@@ -102,13 +118,13 @@
             <div class="acc-content">
                 <div style="padding: 10px;">
                     <strong style="color: #fff;">OpenDeta Websites:</strong>
-                    <a class="site-link" href="https://opendeta.github.io/brainfuck" target="_blank">1: BrainFuck interpreter & Translator</a>
-                    <a class="site-link" href="https://opendeta.github.io/oapk" target="_blank">2: To receive Latest apps and their updates (including Beta Versions) created by OpenDeta</a>
-                    <a class="site-link" href="https://acode3.netlify.app" target="_blank">3: Code Editor/Runner (HTML, CSS, JS)</a>
-                    <a class="site-link" href="https://opendeta.github.io/cs" target="_blank">4: See the various codes Created by OpenDeta</a>
-                    <a class="site-link" href="https://opendeta.github.io/p2p" target="_blank">5: For fast data Sharing in Pairs</a>
-                    <a class="site-link" href="https://binary-pro3.netlify.app/" target="_blank">6: Any Language to Binary Translator</a>
-                    <a class="site-link" href="https://opendeta.github.io/chat" target="_blank">7: Chatbot AI</a>
+                    <a class="site-link" href="https://opendeta.github.io/brainfuck" onclick="linkAnimate(event, this)">1: BrainFuck interpreter & Translator</a>
+                    <a class="site-link" href="https://opendeta.github.io/oapk" onclick="linkAnimate(event, this)">2: To receive Latest apps and their updates (including Beta Versions) created by OpenDeta</a>
+                    <a class="site-link" href="https://acode3.netlify.app" onclick="linkAnimate(event, this)">3: Code Editor/Runner (HTML, CSS, JS)</a>
+                    <a class="site-link" href="https://opendeta.github.io/cs" onclick="linkAnimate(event, this)">4: See the various codes Created by OpenDeta</a>
+                    <a class="site-link" href="https://opendeta.github.io/p2p" onclick="linkAnimate(event, this)">5: For fast data Sharing in Pairs</a>
+                    <a class="site-link" href="https://binary-pro3.netlify.app/" onclick="linkAnimate(event, this)">6: Any Language to Binary Translator</a>
+                    <a class="site-link" href="https://opendeta.github.io/chat" onclick="linkAnimate(event, this)">7: Chatbot AI</a>
                 </div>
             </div>
         </div>
@@ -116,28 +132,27 @@
         <div class="accordion">
             <button class="acc-btn" onclick="toggleAcc(this)">Our Apps <span>+</span></button>
             <div class="acc-content" id="app-list-container">
-                <div class="app-item"><span class="app-name">1: Axiom (Automation Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-(beta).apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">2: Axiom Codex (Automated Coder for Axiom Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-codex-(write-code-with-bot!).apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">3: NetAssistant</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/netassistant-beta-(block-apps-on-your-phone-from-using-the-internet-and-set-internet-usage-times.).apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">4: SnapBlocker</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/snapblocker-(block-all-ads-on-your-phone).apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">5: Ad Blocker Pro (Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockerpro/main/adblockerpro.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">6: Ad Blocker (Normal)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockern/main/adblockern.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">7: Web (Link) To APP</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/webtoapp/main/webtoapp.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">8: HTML To App Maker</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/android-studiohtml/main/android-studiohtml.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">9: Source Code Viewer(Web)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/source-code-viewer/main/source-code-viewer.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">10: Network Speed Meter</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/network-speed-meter/main/network-speed-meter.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">11: Notepad</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/notepad/main/notepad.apk" download>Download App</a></div>
-                <div class="app-item"><span class="app-name">12: Temperature Meter</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/temperature-meter/main/temperature-meter.apk" download>Download App</a></div>
+                <div class="app-item"><span class="app-name">1: Axiom (Automation Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-(beta).apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">2: Axiom Codex (Automated Coder for Axiom Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-codex-(write-code-with-bot!).apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">3: NetAssistant</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/netassistant-beta-(block-apps-on-your-phone-from-using-the-internet-and-set-internet-usage-times.).apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">4: SnapBlocker</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/snapblocker-(block-all-ads-on-your-phone).apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">5: Ad Blocker Pro (Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockerpro/main/adblockerpro.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">6: Ad Blocker (Normal)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockern/main/adblockern.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">7: Web (Link) To APP</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/webtoapp/main/webtoapp.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">8: HTML To App Maker</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/android-studiohtml/main/android-studiohtml.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">9: Source Code Viewer(Web)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/source-code-viewer/main/source-code-viewer.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">10: Network Speed Meter</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/network-speed-meter/main/network-speed-meter.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">11: Notepad</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/notepad/main/notepad.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">12: Temperature Meter</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/temperature-meter/main/temperature-meter.apk" onclick="linkAnimate(event, this)">Download App</a></div>
             </div>
         </div>
 
         <div class="contact-wrapper">
-            <a href="mailto:opendeta.dev@gmail.com" class="contact-btn">Developer Contact & Send Feedback</a>
+            <button class="contact-btn" onclick="linkAnimate(event, 'https://opendeta.github.io/help')">Developer Contact & Send Feedback</button>
         </div>
     </div>
 
     <script>
-        // Binary Rain
         const canvas = document.getElementById('binary-canvas');
         const ctx = canvas.getContext('2d');
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -154,38 +169,43 @@
             });
         }, 30);
 
-        // Warp Animation
+        function linkAnimate(e, target) {
+            e.preventDefault();
+            const url = (typeof target === 'string') ? target : target.href;
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                window.location.href = url;
+                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+            }, 2000);
+        }
+
         function startWarp() {
             document.getElementById('intro-screen').style.display = 'none';
             document.getElementById('binary-canvas').style.display = 'none';
             const gCont = document.getElementById('galaxy-container');
             gCont.style.display = 'block';
-            
             const scene = new THREE.Scene(); 
             const cam = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 1000);
             cam.position.z = 1; cam.rotation.x = Math.PI/2;
             const rend = new THREE.WebGLRenderer({ antialias: true }); rend.setSize(window.innerWidth, window.innerHeight);
             gCont.appendChild(rend.domElement);
-            
             const pts = []; for(let i=0; i<6000; i++) pts.push(new THREE.Vector3(Math.random()*600-300, Math.random()*600-300, Math.random()*600-300));
             const geo = new THREE.BufferGeometry().setFromPoints(pts);
             const stars = new THREE.Points(geo, new THREE.PointsMaterial({color: 0xffffff, size: 0.7}));
             scene.add(stars);
-
             (function anim(){
                 const pos = geo.attributes.position.array;
                 for(let i=1; i<pos.length; i+=3){ pos[i]-=15; if(pos[i]<-300) pos[i]=300; }
                 geo.attributes.position.needsUpdate = true;
                 rend.render(scene, cam); requestAnimationFrame(anim);
             })();
-
             setTimeout(() => {
                 gCont.style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
             }, 1800);
         }
 
-        // Accordion Logic
         function toggleAcc(btn) {
             const content = btn.nextElementSibling;
             const span = btn.querySelector('span');
@@ -195,26 +215,17 @@
             } else {
                 content.style.maxHeight = content.scrollHeight + "px";
                 span.innerText = "-";
-                if(content.id === "app-list-container") {
-                    setTimeout(revealApps, 200);
-                }
+                if(content.id === "app-list-container") { setTimeout(revealApps, 200); }
             }
         }
 
-        // Intersection Observer for App Item Reveal
         function revealApps() {
             const items = document.querySelectorAll('.app-item');
             const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('reveal');
-                    }
-                });
+                entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('reveal'); } });
             }, { threshold: 0.1 });
-
             items.forEach(item => observer.observe(item));
         }
-
         document.getElementById('main-content').addEventListener('scroll', revealApps);
     </script>
 </body>
