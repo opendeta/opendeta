@@ -1,10 +1,26 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
+//শুরু!
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="jqtDtbXoGSKO_IN63m3uybFz0g4QFevNgvP6jZNd0Ts" />
-  <title>OpenDeta — Architecting The Logic</title>
+    
+    <!-- মেইন সার্চ ইঞ্জিন এবং গুগল বটের জন্য কিলার মেটা ট্যাগ -->
+    <title>OpenDeta — Architecting The Logic</title>
+    <meta name="title" content="OpenDeta — Architecting The Logic">
+    <meta name="description" content="At OpenDeta, we are constantly trying to create something new, which makes your daily work easier and smarter.">
+    
+    <!-- ওপেন গ্রাফ (OG) ট্যাগ - যা গিটহাবের ডিফল্ট নামকে লাথি মেরে সরাবে -->
+    <meta property="og:site_name" content="OpenDeta">
+    <meta property="og:title" content="OpenDeta — Architecting The Logic">
+    <meta property="og:description" content="At OpenDeta, we are constantly trying to create something new, which makes your daily work easier and smarter.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://opendeta.github.io/opendeta/">
+    
+    <!-- মোবাইল ব্রাউজার টাইটেল ফিক্স -->
+    <meta name="apple-mobile-web-app-title" content="OpenDeta">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -83,6 +99,7 @@
         #galaxy-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 60; }
     </style>
 </head>
+//এখানে শেষ!😉
 <body>
 
     <canvas id="binary-canvas"></canvas>
@@ -110,7 +127,7 @@
         <div class="accordion">
             <button class="acc-btn" onclick="toggleAcc(this)">About OpenDeta <span>+</span></button>
             <div class="acc-content">
-                <p style="padding: 15px;">At OpenDeta, we are constantly trying to create something new, which makes your daily work easier and smarter. <br><br> Our mission: “Building The Logic of Tomorrow”.Each of our projects and ideas is designed with the goal of making it easier for people to connect with the technology of tomorrow. Welcome to join us on the journey of new possibilities and innovations.</p>
+                <p style="padding: 15px;">At OpenDeta, we are constantly trying to create something new, which makes your daily work easier and smarter. <br><br> Our mission: “Architecting The Logic”.<br> Each of our projects and ideas is designed with the goal of making it easier for people to connect with the technology of tomorrow. Welcome to join us on the journey of new possibilities and innovations.</p>
             </div>
         </div>
 
@@ -133,12 +150,13 @@
         <div class="accordion">
             <button class="acc-btn" onclick="toggleAcc(this)">Our Apps <span>+</span></button>
             <div class="acc-content" id="app-list-container">
-                <div class="app-item"><span class="app-name">1: Axiom (Automation Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-(beta)%5B3%5D.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">1: Axiom (Automation Browser)</span><a class="download-btn"
+ href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-(beta)%5B5%5D.apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">2: Axiom Codex (Automated Coder for Axiom Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/axiom-codex-(write-code-with-bot!).apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">3: NetAssistant</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/netassistant-beta-(block-apps-on-your-phone-from-using-the-internet-and-set-internet-usage-times.).apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">4: SnapBlocker</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/app-storage/main/apks/snapblocker-(block-all-ads-on-your-phone).apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">5: Ad Blocker Pro (Browser)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockerpro/main/adblockerpro.apk" onclick="linkAnimate(event, this)">Download App</a></div>
-                <div class="app-item"><span class="app-name">6: Ad Blocker (Normal)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockern/main/adblockern.apk" onclick="linkAnimate(event, this)">Download App</a></div>
+                <div class="app-item"><span class="app-name">6: Ad Blocker (Lite)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/adblockern/main/adblockern.apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">7: Web (Link) To APP</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/webtoapp/main/webtoapp.apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">8: HTML To App Maker</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/android-studiohtml/main/android-studiohtml.apk" onclick="linkAnimate(event, this)">Download App</a></div>
                 <div class="app-item"><span class="app-name">9: Source Code Viewer(Web)</span><a class="download-btn" href="https://raw.githubusercontent.com/opendeta/source-code-viewer/main/source-code-viewer.apk" onclick="linkAnimate(event, this)">Download App</a></div>
